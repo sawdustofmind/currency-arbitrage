@@ -51,15 +51,41 @@ type ShortestPaths struct {
 	next [][]*int
 }
 
-func (p ShortestPaths) Get(u, v int) ([]int, float64) {
+func (p ShortestPaths) HasCycles() bool {
+	V := len(p.dist)
+	for i := 0; i < V; i++ {
+		if p.dist[i][i] < 0 {
+			return true
+		}
+	}
+	return false
+}
+
+// Get returns shortest path with distance if graph has no negative cycles.
+// Otherwise, path to any vert of cycle and all vertices of cycle
+func (p ShortestPaths) Get(u, v int) ([]int, []int, float64) {
 	dist := p.dist[u][v]
 	if p.next[u][v] == nil {
-		return nil, 0
+		return nil, nil, 0
 	}
 	path := []int{u}
 	for u != v {
 		u = *p.next[u][v]
+		if pathToCycle, cycle, ok := p.checkCycle(path, u); ok {
+			return pathToCycle, cycle, 0
+		}
 		path = append(path, u)
 	}
-	return path, dist
+	return path, nil, dist
+}
+
+func (p ShortestPaths) checkCycle(path []int, next int) ([]int, []int, bool) {
+	for i, prev := range path {
+		if prev == next {
+			pathToCycle := path[:i+1]
+			cycle := path[i:]
+			return pathToCycle, cycle, true
+		}
+	}
+	return nil, nil, false
 }
