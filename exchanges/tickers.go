@@ -42,8 +42,8 @@ func (t *Tickers) ToEdges() map[int]map[int]float64 {
 			edges[quoteIndex] = make(map[int]float64)
 		}
 
-		edges[baseIndex][quoteIndex] = -math.Log(ticker.BuyPrice)
-		edges[quoteIndex][baseIndex] = math.Log(ticker.SellPrice)
+		edges[baseIndex][quoteIndex] = -math.Log(ticker.BuyPrice * (1 - ExmoComission))
+		edges[quoteIndex][baseIndex] = math.Log(ticker.SellPrice / (1 - ExmoComission))
 	}
 	return edges
 }

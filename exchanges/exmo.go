@@ -11,6 +11,9 @@ import (
 // ExmoURL is the url to exmo api
 const ExmoURL = "https://api.exmo.me/v1/ticker/"
 
+// ExmoComission is commision that is being taken after any order execution
+const ExmoComission = 0.002
+
 type exmoTicker struct {
 	BuyPrice  string `json:"buy_price"`
 	SellPrice string `json:"sell_price"`
