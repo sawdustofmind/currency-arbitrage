@@ -30,6 +30,7 @@ func FloydWarshall(edges map[int]map[int]float64) *ShortestPaths {
 		}
 	}
 
+LOOP:
 	for k := 0; k < V; k++ {
 		for i := 0; i < V; i++ {
 			for j := 0; j < V; j++ {
@@ -37,6 +38,11 @@ func FloydWarshall(edges map[int]map[int]float64) *ShortestPaths {
 					dist[i][j] = dist[i][k] + dist[k][j]
 					next[i][j] = next[i][k]
 				}
+			}
+		}
+		for i := 0; i < V; i++ {
+			if dist[i][i] < 0 {
+				break LOOP
 			}
 		}
 	}
@@ -69,6 +75,12 @@ func (p ShortestPaths) Get(u, v int) ([]int, []int, float64) {
 		return nil, nil, 0
 	}
 	path := []int{u}
+	if u == v {
+		u = *p.next[u][v]
+		if u != v {
+			path = append(path, u)
+		}
+	}
 	for u != v {
 		u = *p.next[u][v]
 		if pathToCycle, cycle, ok := p.checkCycle(path, u); ok {
