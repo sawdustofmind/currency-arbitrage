@@ -15,12 +15,12 @@ func TestParseExmo(t *testing.T) {
 	tickers, err := parseExmoTickers(rawTickers)
 	require.NoError(t, err)
 	assert.ElementsMatch(t, ExmoTickersExample.Currencies, tickers.Currencies)
-	assert.Equal(t, ExmoTickersExample.Instance, tickers.Instance)
+	assert.Equal(t, ExmoTickersExample.tickers, tickers.tickers)
 }
 
 var ExmoTickersExample = Tickers{
 	Currencies: []string{"USD", "RUB", "BTC", "ETH"},
-	Instance: map[TickerKey]Ticker{
+	tickers: map[tickerKey]Ticker{
 		{Base: "BTC", Quote: "RUB"}: {BuyPrice: 341999.000037, SellPrice: 342771.74790796},
 		{Base: "USD", Quote: "RUB"}: {BuyPrice: 65.25000001, SellPrice: 65.4},
 		{Base: "ETH", Quote: "BTC"}: {BuyPrice: 0.03181388, SellPrice: 0.03191428},

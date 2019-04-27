@@ -33,47 +33,37 @@ func requestExmoTickers() (map[string]exmoTicker, error) {
 	return rawTickers, nil
 }
 
-func parseExmoTickers(rawTickers map[string]exmoTicker) (Tickers, error) {
-	tickers := Tickers{}
-	tickers.Instance = make(map[TickerKey]Ticker, len(rawTickers))
-	currencies := make(map[string]struct{})
+func parseExmoTickers(rawTickers map[string]exmoTicker) (*Tickers, error) {
+	tickers := NewTickers(len(rawTickers))
 	for key, rawTicker := range rawTickers {
 		baseQuote := strings.Split(key, "_")
 		if len(baseQuote) != 2 {
-			return Tickers{}, fmt.Errorf("incorrect ticker, %v", key)
+			return nil, fmt.Errorf("incorrect ticker, %v", key)
 		}
 		base, quote := baseQuote[0], baseQuote[1]
 
 		buyPrice, err := strconv.ParseFloat(rawTicker.BuyPrice, 64)
 		if err != nil {
-			return Tickers{}, err
+			return nil, err
 		}
 		sellPrice, err := strconv.ParseFloat(rawTicker.SellPrice, 64)
 		if err != nil {
-			return Tickers{}, err
+			return nil, err
 		}
-		tk := TickerKey{Base: base, Quote: quote}
-		tickers.Instance[tk] = Ticker{BuyPrice: buyPrice, SellPrice: sellPrice}
-		currencies[base] = struct{}{}
-		currencies[quote] = struct{}{}
+		tickers.add(base, quote, Ticker{BuyPrice: buyPrice, SellPrice: sellPrice})
 	}
-	currenciesSlice := make([]string, 0, len(currencies))
-	for cur := range currencies {
-		currenciesSlice = append(currenciesSlice, cur)
-	}
-	tickers.Currencies = currenciesSlice
 	return tickers, nil
 }
 
 // GetExmoTickers do get request to tickers exmo api, then it parses result
-func GetExmoTickers() (Tickers, error) {
+func GetExmoTickers() (*Tickers, error) {
 	rawTickers, err := requestExmoTickers()
 	if err != nil {
-		return Tickers{}, err
+		return nil, err
 	}
 	tickers, err := parseExmoTickers(rawTickers)
 	if err != nil {
-		return Tickers{}, err
+		return nil, err
 	}
 	return tickers, nil
 }
