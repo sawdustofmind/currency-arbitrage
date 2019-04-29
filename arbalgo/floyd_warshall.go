@@ -37,12 +37,10 @@ LOOP:
 				if dist[i][j] > dist[i][k]+dist[k][j] {
 					dist[i][j] = dist[i][k] + dist[k][j]
 					next[i][j] = next[i][k]
+					if i == j && dist[i][j] < 0 {
+						break LOOP
+					}
 				}
-			}
-		}
-		for i := 0; i < V; i++ {
-			if dist[i][i] < 0 {
-				break LOOP
 			}
 		}
 	}
