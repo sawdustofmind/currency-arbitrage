@@ -1,0 +1,63 @@
+<html>
+
+<head>
+    <title>exmo</title>
+</head>
+
+<body>
+    <h1>Exmo arbitrage history</h1>
+    <table border="1" cellspacing="0">
+        <thead>
+            <tr>
+                <th>Time</th>
+                <th>Cycle</th>
+                <th>Profit(%)</th>
+                <th>Report</th>
+            </tr>
+        </thead>
+        <tbody id="histbody">
+
+        </tbody>
+    </table>
+    <script>
+        function ajax_get(url, callback) {
+            var xmlhttp = new XMLHttpRequest();
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    try {
+                        var data = JSON.parse(xmlhttp.responseText);
+                    } catch (err) {
+                        console.log(err.message + " in " + xmlhttp.responseText);
+                        return;
+                    }
+                    callback(data);
+                }
+            };
+
+            xmlhttp.open("GET", url, true);
+            xmlhttp.send();
+        }
+
+        function refresh() {
+            console.log("refresh")
+            ajax_get('/history/exmo', function (hist) {
+                var histbody = ""
+                hist.forEach(entry => {
+                    histbody += "<tr>"
+                    histbody += "<td>" + entry.time + "</td>"
+                    histbody += "<td>" + entry.cycle + "</td>"
+                    histbody += "<td>" + entry.profit + "</td>"
+                    histbody += "<td>" + entry.report + "</td>"
+                    histbody += "</tr>"
+                });
+                document.getElementById("histbody").innerHTML = histbody;
+            })
+        }
+        
+        refresh()
+        setInterval(refresh, 3000);
+
+    </script>
+</body>
+
+</html>

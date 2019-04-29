@@ -37,6 +37,8 @@ func main() {
 		}
 		w.Write(bytes)
 	}
+	fs := http.FileServer(http.Dir("static"))
+	http.Handle("/", fs)
 	http.HandleFunc("/history/exmo", handler)
 	if err := http.ListenAndServe(":"+port, nil); err != nil {
 		panic(err)
