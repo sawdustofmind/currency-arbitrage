@@ -14,12 +14,11 @@ import (
 const checkInterval = 5 * time.Second
 
 func main() {
-	if len(os.Args) < 2 {
-		log.Fatal("PORT must be set as first command-line argument")
+	port := os.Getenv("PORT")
+	if port == "" {
+		log.Fatal("PORT env must be set")
 	}
-	port := os.Args[1]
 	log.Println("info, starting server at", port)
-
 	store := ArbitrageHistoryStore{}
 	startExmoChecking(&store, checkInterval)
 
