@@ -56,7 +56,7 @@ func (t *Tickers) Get(base, quote string) *Ticker {
 }
 
 // ToEdges converts tickers to graph that can be used in arbalgo
-func (t *Tickers) ToEdges(comission float64) map[int]map[int]float64 {
+func (t *Tickers) ToEdges(commission float64) map[int]map[int]float64 {
 	edges := make(map[int]map[int]float64)
 	for tk, ticker := range t.tickers {
 		baseIndex := t.currencyToIndex[tk.Base]
@@ -68,8 +68,8 @@ func (t *Tickers) ToEdges(comission float64) map[int]map[int]float64 {
 			edges[quoteIndex] = make(map[int]float64)
 		}
 
-		edges[baseIndex][quoteIndex] = -math.Log(ticker.BuyPrice * (1 - comission))
-		edges[quoteIndex][baseIndex] = math.Log(ticker.SellPrice / (1 - comission))
+		edges[baseIndex][quoteIndex] = -math.Log(ticker.BuyPrice * (1 - commission))
+		edges[quoteIndex][baseIndex] = math.Log(ticker.SellPrice / (1 - commission))
 	}
 	return edges
 }

@@ -27,7 +27,7 @@ func main() {
 		w.Header().Add("Content-Type", "application/json")
 		entries := store.Get()
 		if len(entries) == 0 {
-			w.Write([]byte("[]"))
+			_, _ = w.Write([]byte("[]"))
 			return
 		}
 		bytes, err := json.Marshal(entries)
@@ -35,7 +35,7 @@ func main() {
 			bytes, _ = json.Marshal(err.Error())
 			w.WriteHeader(400)
 		}
-		w.Write(bytes)
+		_, _ = w.Write(bytes)
 	}
 	fs := http.FileServer(http.Dir("static"))
 	http.Handle("/", fs)
@@ -63,7 +63,7 @@ func checkExmoOnArbitrage(store *ArbitrageHistoryStore) {
 		log.Printf("error, exmo api request tickers fail, err=%v", err)
 		return
 	}
-	shortestPaths := arbalgo.FloydWarshall(tickers.ToEdges(exchanges.ExmoComission))
+	shortestPaths := arbalgo.FloydWarshall(tickers.ToEdges(exchanges.ExmoCommission))
 	if !shortestPaths.HasCycles() {
 		log.Println("info, no currency arbitrage")
 		return
@@ -71,7 +71,7 @@ func checkExmoOnArbitrage(store *ArbitrageHistoryStore) {
 	V := len(tickers.Currencies)
 	cycles := arbalgo.FindUniqueCycles(shortestPaths, V)
 	for _, cycle := range cycles {
-		pricePath, price, _ := tickers.GetPricePath(cycle, exchanges.ExmoComission)
+		pricePath, price, _ := tickers.GetPricePath(cycle, exchanges.ExmoCommission)
 		currencyPath := tickers.GetCurrencyPath(cycle)
 		profit := (price - 1) * 100
 
