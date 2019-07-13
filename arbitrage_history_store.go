@@ -2,6 +2,7 @@ package main
 
 import (
 	"math"
+	"reflect"
 	"sync"
 	"time"
 
@@ -26,11 +27,15 @@ type ArbitrageHistoryStore struct {
 }
 
 func (s *ArbitrageHistoryStore) Add(e *ArbitrageHistoryEntry) {
+	cycle := make([]int, 0, len(e.Path))
+	copy(e.Path, cycle)
+	cycle = arbalgo.ArrangeCycle(cycle)
+
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	var nearestSameCycle *ArbitrageHistoryEntry
 	for i := len(s.entries) - 1; i >= 0; i-- {
-		if arbalgo.SameCycles(s.entries[i].Path, e.Path) {
+		if reflect.DeepEqual(s.entries[i].Path, cycle) {
 			nearestSameCycle = &s.entries[i]
 		}
 	}
@@ -44,7 +49,9 @@ func (s *ArbitrageHistoryStore) put(e *ArbitrageHistoryEntry) {
 	if len(s.entries) == ArbitrageHistorySize {
 		s.entries = s.entries[1:]
 	}
-	s.entries = append(s.entries, *e)
+	newEntry := *e
+	newEntry.Path = arbalgo.ArrangeCycle(newEntry.Path)
+	s.entries = append(s.entries, newEntry)
 }
 
 func (s *ArbitrageHistoryStore) Get() []ArbitrageHistoryEntry {

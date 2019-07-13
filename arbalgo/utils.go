@@ -1,9 +1,6 @@
 package arbalgo
 
-import (
-	"reflect"
-	"sort"
-)
+import "reflect"
 
 func FindUniqueCycles(p *ShortestPaths, V int) [][]int {
 	cycles := [][]int{}
@@ -13,9 +10,10 @@ func FindUniqueCycles(p *ShortestPaths, V int) [][]int {
 			if len(cycle) == 0 {
 				continue
 			}
+			cycle = ArrangeCycle(cycle)
 			contains := false
 			for _, c := range cycles {
-				if SameCycles(c, cycle) {
+				if reflect.DeepEqual(c, cycle) {
 					contains = true
 					break
 				}
@@ -28,10 +26,13 @@ func FindUniqueCycles(p *ShortestPaths, V int) [][]int {
 	return cycles
 }
 
-func SameCycles(first []int, second []int) bool {
-	firstCopy := first[:]
-	sort.Ints(firstCopy)
-	secondCopy := second[:]
-	sort.Ints(secondCopy)
-	return reflect.DeepEqual(firstCopy, secondCopy)
+// ArrangeCycle sorts cycle that minimum element moves to the start of cycle path
+func ArrangeCycle(cycle []int) []int {
+	minI := 0
+	for i, v := range cycle {
+		if v < cycle[minI] {
+			minI = i
+		}
+	}
+	return append(cycle[minI:], cycle[0:minI]...)
 }
