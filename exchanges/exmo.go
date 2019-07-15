@@ -14,6 +14,28 @@ const ExmoURL = "https://api.exmo.me/v1/ticker/"
 // ExmoCommission is commission that is being taken after any order execution
 const ExmoCommission = 0.002
 
+type Exmo struct{}
+
+func (e *Exmo) GetName() string {
+	return "Exmo"
+}
+
+func (e *Exmo) GetCommission() float64 {
+	return ExmoCommission
+}
+
+func (e *Exmo) GetTickers() (*Tickers, error) {
+	rawTickers, err := requestExmoTickers()
+	if err != nil {
+		return nil, err
+	}
+	tickers, err := parseExmoTickers(rawTickers)
+	if err != nil {
+		return nil, err
+	}
+	return tickers, nil
+}
+
 type exmoTicker struct {
 	BuyPrice  string `json:"buy_price"`
 	SellPrice string `json:"sell_price"`
@@ -51,19 +73,6 @@ func parseExmoTickers(rawTickers map[string]exmoTicker) (*Tickers, error) {
 			return nil, err
 		}
 		tickers.add(base, quote, Ticker{BuyPrice: buyPrice, SellPrice: sellPrice})
-	}
-	return tickers, nil
-}
-
-// GetExmoTickers do get request to tickers exmo api, then it parses result
-func GetExmoTickers() (*Tickers, error) {
-	rawTickers, err := requestExmoTickers()
-	if err != nil {
-		return nil, err
-	}
-	tickers, err := parseExmoTickers(rawTickers)
-	if err != nil {
-		return nil, err
 	}
 	return tickers, nil
 }

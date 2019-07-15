@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/sawdustofmind/currency-arbitrage/arbalgo"
@@ -13,6 +14,11 @@ import (
 
 const checkInterval = 5 * time.Second
 
+type exchangeInfo struct {
+	Route string `json:"route,omitempty"`
+	Name  string `json:"name,omitempty"`
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("PORT must be set as first command-line argument")
@@ -20,52 +26,62 @@ func main() {
 	port := os.Args[1]
 	log.Println("info, starting server at", port)
 
-	store := ArbitrageHistoryStore{}
-	startExmoChecking(&store, checkInterval)
-
-	handler := func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Add("Content-Type", "application/json")
-		entries := store.Get()
-		if len(entries) == 0 {
-			_, _ = w.Write([]byte("[]"))
-			return
+	es := []exchanges.Exchange{&exchanges.Exmo{}}
+	exchangesInfo := make([]exchangeInfo, 0, len(es))
+	for _, ex := range es {
+		store := ArbitrageHistoryStore{}
+		handler := func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Add("Content-Type", "application/json")
+			entries := store.Get()
+			if len(entries) == 0 {
+				_, _ = w.Write([]byte("[]"))
+				return
+			}
+			bytes, err := json.Marshal(entries)
+			if err != nil {
+				bytes, _ = json.Marshal(err.Error())
+				w.WriteHeader(400)
+			}
+			_, _ = w.Write(bytes)
 		}
-		bytes, err := json.Marshal(entries)
-		if err != nil {
-			bytes, _ = json.Marshal(err.Error())
-			w.WriteHeader(400)
-		}
-		_, _ = w.Write(bytes)
+		route := "/history/" + strings.ToLower(ex.GetName())
+		http.HandleFunc(route, handler)
+		exchangesInfo = append(exchangesInfo, exchangeInfo{Route: route, Name: ex.GetName()})
+		startChecking(ex, &store, checkInterval)
 	}
+	http.HandleFunc("/exchanges", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Content-Type", "application/json")
+		bytes, _ := json.Marshal(exchangesInfo)
+		w.Write(bytes)
+	})
 	fs := http.FileServer(http.Dir("static"))
 	http.Handle("/", fs)
-	http.HandleFunc("/history/exmo", handler)
 	if err := http.ListenAndServe(":"+port, nil); err != nil {
 		panic(err)
 	}
 }
 
-func startExmoChecking(store *ArbitrageHistoryStore, interval time.Duration) {
+func startChecking(exchange exchanges.Exchange, store *ArbitrageHistoryStore, interval time.Duration) {
 	ticker := time.NewTicker(interval)
 	go func() {
 		defer ticker.Stop()
 		for {
-			checkExmoOnArbitrage(store)
+			checkOnArbitrage(exchange, store)
 			<-ticker.C
 		}
 	}()
 }
 
-func checkExmoOnArbitrage(store *ArbitrageHistoryStore) {
+func checkOnArbitrage(exchange exchanges.Exchange, store *ArbitrageHistoryStore) {
 	now := time.Now()
-	tickers, err := exchanges.GetExmoTickers()
+	tickers, err := exchange.GetTickers()
 	if err != nil {
-		log.Printf("error, exmo api request tickers fail, err=%v", err)
+		log.Printf("error, %v api request tickers fail, err=%v", exchange.GetName(), err)
 		return
 	}
-	shortestPaths := arbalgo.FloydWarshall(tickers.ToEdges(exchanges.ExmoCommission))
+	shortestPaths := arbalgo.FloydWarshall(tickers.ToEdges(exchange.GetCommission()))
 	if !shortestPaths.HasCycles() {
-		log.Println("info, no currency arbitrage")
+		log.Printf("info, %s - no currency arbitrage", exchange.GetName())
 		return
 	}
 	V := len(tickers.Currencies)
@@ -75,7 +91,7 @@ func checkExmoOnArbitrage(store *ArbitrageHistoryStore) {
 		currencyPath := tickers.GetCurrencyPath(cycle)
 		profit := (price - 1) * 100
 
-		log.Printf("info, found currency arbitrage:%s, profit:%.4f%% [%s]", currencyPath, profit, pricePath)
+		log.Printf("info, %s - found currency arbitrage:%s, profit:%.4f%% [%s]", exchange.GetName(), currencyPath, profit, pricePath)
 		entry := ArbitrageHistoryEntry{
 			Time:   now,
 			Cycle:  currencyPath,

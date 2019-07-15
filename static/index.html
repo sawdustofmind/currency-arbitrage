@@ -1,24 +1,12 @@
 <html>
 
 <head>
-    <title>exmo</title>
+    <title>Arbitrage</title>
 </head>
 
 <body>
-    <h1>Exmo arbitrage history</h1>
-    <table border="1" cellspacing="0">
-        <thead>
-            <tr>
-                <th>Time</th>
-                <th>Cycle</th>
-                <th>Profit(%)</th>
-                <th>Report</th>
-            </tr>
-        </thead>
-        <tbody id="histbody">
-
-        </tbody>
-    </table>
+    <h1>Exchanges</h1>
+    <ul id="links"></ul>
     <script>
         function ajax_get(url, callback) {
             var xmlhttp = new XMLHttpRequest();
@@ -38,9 +26,9 @@
             xmlhttp.send();
         }
 
-        function refresh() {
+        function refresh(route, selectorId) {
             console.log("refresh")
-            ajax_get('/history/exmo', function (hist) {
+            ajax_get(route, function (hist) {
                 var histbody = ""
                 hist.forEach(entry => {
                     histbody += "<tr>"
@@ -50,13 +38,50 @@
                     histbody += "<td>" + entry.report + "</td>"
                     histbody += "</tr>"
                 });
-                document.getElementById("histbody").innerHTML = histbody;
+                document.getElementById(selectorId).innerHTML = histbody;
             })
         }
         
-        refresh()
-        setInterval(refresh, 3000);
+        ajax_get('/exchanges', function (hist) {
+            hist.forEach(exchange => {
+                var name = exchange["name"]
+                var route = exchange["route"]
 
+                var body = document.getElementsByTagName("body")[0]
+                var header = document.createElement("h1")
+                header.id=name+"_start"
+                header.innerText = name + " arbitrage history"
+                body.appendChild(header)
+            
+                var content = "<thead>"
+                content += "<tr>"
+                content += "<th>Time</th>"
+                content += "<th>Cycle</th>"
+                content += "<th>Profit(%)</th>"
+                content += "<th>Report</th>"
+                content += "</tr>"
+                content += "</thead>"
+                content += "<tbody id=\"" + name + "\">"
+                content += "</tbody>"
+                var table = document.createElement("table");
+                table.border = 1
+                table.cellSpacing = 0
+                table.innerHTML = content
+                body.appendChild(table)
+
+                link = document.createElement("a")
+                link.innerText = name
+                link.href = "#" + name + "_start"
+                var links = document.getElementById("links")
+                var linkP = document.createElement("h3")
+                linkP.appendChild(link)
+                links.appendChild(linkP)
+
+                refreshFn = () => refresh(route, name)
+                refreshFn()
+                setInterval(refreshFn, 3000);
+            });
+        })
     </script>
 </body>
 
