@@ -26,7 +26,7 @@ func main() {
 	port := os.Args[1]
 	log.Println("info, starting server at", port)
 
-	es := []exchanges.Exchange{&exchanges.Exmo{}, &exchanges.Binance{}}
+	es := []exchanges.Exchange{&exchanges.Exmo{}, &exchanges.Binance{}, &exchanges.Bitfinex{}}
 	exchangesInfo := make([]exchangeInfo, 0, len(es))
 	for _, ex := range es {
 		store := ArbitrageHistoryStore{}
