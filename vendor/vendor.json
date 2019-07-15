@@ -9,16 +9,35 @@
 			"revisionTime": "2019-06-12T05:18:28Z"
 		},
 		{
+			"checksumSHA1": "3JXkdw4Wdz2PZZT7TEhVgXPnh40=",
+			"path": "github.com/bitfinexcom/bitfinex-api-go",
+			"revision": "0318e60b97ed88ee67044044fd4b4c57d27b8229",
+			"revisionTime": "2019-07-09T09:08:01Z",
+			"tree": true
+		},
+		{
 			"checksumSHA1": "0EhLvZ6Og9HYqJtCc2Dzs1EgM30=",
 			"path": "github.com/bitly/go-simplejson",
 			"revision": "9db4a59bd4d803ae0c173a7d8a538e056cd59d57",
 			"revisionTime": "2018-11-14T20:31:07Z"
 		},
 		{
+			"checksumSHA1": "CSPbwbyzqA6sfORicn4HFtIhF/c=",
+			"path": "github.com/davecgh/go-spew/spew",
+			"revision": "d8f796af33cc11cb798c1aaeb27a4ebc5099927d",
+			"revisionTime": "2018-08-30T19:11:22Z"
+		},
+		{
 			"checksumSHA1": "hoilQzrHNOxF5Tc6ctXNTDpv4ck=",
 			"path": "github.com/gorilla/websocket",
 			"revision": "ae1634f6a98965ded3b8789c626cb4e0bd78c3de",
 			"revisionTime": "2019-06-29T18:55:28Z"
+		},
+		{
+			"checksumSHA1": "BoXdUBWB8UnSlFlbnuTQaPqfCGk=",
+			"path": "github.com/op/go-logging",
+			"revision": "970db520ece77730c7e4724c61121037378659d9",
+			"revisionTime": "2016-03-15T20:05:05Z"
 		},
 		{
 			"path": "https://github.com/adshao/go-binance",

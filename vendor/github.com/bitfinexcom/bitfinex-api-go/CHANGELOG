@@ -1,0 +1,12 @@
+2.2.0
+
+- Adds v2/ws connection multiplexer
+- Adds v2/ws api functions ConnectionCount and StartNewConnection
+
+2.1.1
+
+- Removes usage of string(int) conversion in v2/rest and uses strconv.FormatInt instead
+- Adds version file
+- Adds changelog file
+- Fix v2/rest response error message to be passed down correctly
+- Rework v2/rest/orders api, change function names and add additionals
