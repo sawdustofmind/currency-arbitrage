@@ -74,8 +74,9 @@ func (t *Tickers) ToEdges(commission float64) map[int]map[int]float64 {
 	return edges
 }
 
-// GetCurrencyPath makes currency representation of index path
+// GetCurrencyPath makes currencies lexicographically ordered representation of index path
 func (t *Tickers) GetCurrencyPath(path []int) string {
+	path = t.arrangedCyclePath(path)
 	currencies := make([]string, 0, len(path))
 	for _, i := range path {
 		currencies = append(currencies, t.Currencies[i])
@@ -85,6 +86,7 @@ func (t *Tickers) GetCurrencyPath(path []int) string {
 
 // GetPricePath makes price report of index path
 func (t *Tickers) GetPricePath(path []int, commission float64) (string, float64, error) {
+	path = t.arrangedCyclePath(path)
 	finalPrice := 1.0
 	reprSlice := make([]string, 0, len(path))
 	for i := 0; i < len(path)-1; i++ {
@@ -125,4 +127,16 @@ func (t *Tickers) getTickerPricePath(i, j int, commission float64) (string, floa
 		repr = fmt.Sprintf("(1/%.8f/%.3f)", ticker.SellPrice, commission)
 	}
 	return repr, price, nil
+}
+
+func (t *Tickers) arrangedCyclePath(path []int) []int {
+	pivotI := 0
+	for i, v := range path {
+		if t.Currencies[v] < t.Currencies[path[pivotI]] {
+			pivotI = i
+		}
+	}
+	cpy := make([]int, len(path))
+	copy(cpy, path)
+	return append(cpy[pivotI:], cpy[:pivotI]...)
 }
