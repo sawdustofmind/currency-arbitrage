@@ -1,0 +1,29 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "0SXvzA/Jg8BAhWo3Pv4MficQ6NI=",
+			"path": "github.com/adshao/go-binance",
+			"revision": "2aa5200818f7c7a22e82b878130119a27605d35f",
+			"revisionTime": "2019-06-12T05:18:28Z"
+		},
+		{
+			"checksumSHA1": "0EhLvZ6Og9HYqJtCc2Dzs1EgM30=",
+			"path": "github.com/bitly/go-simplejson",
+			"revision": "9db4a59bd4d803ae0c173a7d8a538e056cd59d57",
+			"revisionTime": "2018-11-14T20:31:07Z"
+		},
+		{
+			"checksumSHA1": "hoilQzrHNOxF5Tc6ctXNTDpv4ck=",
+			"path": "github.com/gorilla/websocket",
+			"revision": "ae1634f6a98965ded3b8789c626cb4e0bd78c3de",
+			"revisionTime": "2019-06-29T18:55:28Z"
+		},
+		{
+			"path": "https://github.com/adshao/go-binance",
+			"revision": ""
+		}
+	],
+	"rootPath": "github.com/sawdustofmind/currency-arbitrage"
+}
