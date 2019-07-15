@@ -8,6 +8,10 @@ Next to deal with commission we multiply each edge weight by 1 minus commission 
 
 Currently implemented only Floyd-Warshall algorithm that immediately stops when negative cycle occurred
 
+## Demo
+You see demo [here](http://193.187.174.47/)
+![image](https://user-images.githubusercontent.com/29863444/61198947-bae78480-a6e4-11e9-957d-c366d59aad03.png)
+
 ## Deploy
 
 ### With docker
@@ -21,5 +25,3 @@ Here is a default docker multistage build
 
 `go build && ./currency_arbitrage PORT`
 
-### Demo
-You see demo [here](https://immense-dawn-98427.herokuapp.com/)
