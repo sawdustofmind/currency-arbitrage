@@ -79,7 +79,6 @@ func checkExmoOnArbitrage(store *ArbitrageHistoryStore) {
 		entry := ArbitrageHistoryEntry{
 			Time:   now,
 			Cycle:  currencyPath,
-			Path:   cycle,
 			Report: pricePath,
 			Profit: profit,
 		}
